@@ -4,27 +4,29 @@
 %%% Created : 22 Nov 2009 by sinnus <sinnus@linux>
 -module(http_context).
 
--export([ensure_session_id/1]).
-
+-export([ensure_session_id/2]).
+-include("common.hrl").
 -define(SESSION_COOKIE, "PHPSESSID").
 
-%% Internal functions
-ensure_session_id(ReqData) ->
+ensure_session_id(ReqData, Context) ->
     SessionIdValue = wrq:get_cookie_value(?SESSION_COOKIE, ReqData),
-    create_or_update_ssid(ReqData, SessionIdValue).
+    create_or_update_ssid(ReqData, Context, SessionIdValue).
 
-create_or_update_ssid(ReqData, undefined) ->
+%% Internal functions
+create_or_update_ssid(ReqData, Context, undefined) ->
     SessionId = http_session_server:new_session(http_session_server),
-    replace_cookie_value(ReqData, ?SESSION_COOKIE, SessionId);
+    ReqData1 = replace_cookie_value(ReqData, ?SESSION_COOKIE, SessionId),
+    {ReqData1, Context#http_context{ssid = SessionId}};
     
-create_or_update_ssid(ReqData, SessionIdValue) ->
+create_or_update_ssid(ReqData, Context, SessionIdValue) ->
     SessionId = list_to_binary(SessionIdValue),
     case http_session_server:new_or_update_session(http_session_server, SessionId) of
 	{update, _} ->
-	    ReqData;
+	    {ReqData, Context#http_context{ssid = SessionId}};
 	{new, NewSessionId} ->
-	    replace_cookie_value(ReqData, ?SESSION_COOKIE, NewSessionId)
-    end.    
+	    {replace_cookie_value(ReqData, ?SESSION_COOKIE, NewSessionId),
+	     Context#http_context{ssid = NewSessionId}}
+    end.
 
 %% Move to macros
 replace_cookie_value(ReqData, CookieName, CookieValue) ->

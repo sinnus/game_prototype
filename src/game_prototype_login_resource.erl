@@ -6,4 +6,5 @@
 -include_lib("request_html.hrl").
 
 html(ReqData, Context) ->
-    {"<html><body>Login page</body></html>", ReqData, Context}.
+    Ssid = binary_to_list(Context#http_context.ssid),
+    {"<html><body>Login page: " ++ Ssid ++ "</body></html>", ReqData, Context}.

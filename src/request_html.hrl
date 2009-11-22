@@ -5,9 +5,10 @@
 	 charsets_provided/2]).
 
 -include_lib("webmachine/include/webmachine.hrl").
+-include("common.hrl").
 
-init(DispatchArgs) ->
-    {ok, DispatchArgs}.
+init(_DispatchArgs) ->
+    {ok, #http_context{}}.
 
 service_available(ReqData, Context) ->
     {true, ReqData, Context}.
@@ -16,5 +17,5 @@ charsets_provided(ReqData, Context) ->
     {[{"utf-8", fun(X) -> X end}], ReqData, Context}.
 
 to_html(ReqData, Context) ->
-    ReqData1 = http_context:ensure_session_id(ReqData),
-    html(ReqData1, Context).
+    {ReqData1, Context1} = http_context:ensure_session_id(ReqData, Context),
+    html(ReqData1, Context1).

@@ -1,3 +1,5 @@
+-record(http_context, {ssid}).
+
 %% Logger macros
 -define(PRINT(Format, Args),
 	io:format(Format, Args)).

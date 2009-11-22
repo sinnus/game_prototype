@@ -63,9 +63,13 @@ init([]) ->
     HttpSessionServer = {http_session_server,
 			 {http_session_server, start_link, []},
 			 permanent, 5000, worker, dynamic},
+    AuthServer = {auth_server,
+		  {auth_server, start_link, []},
+		  permanent, 5000, worker, dynamic},
 
     Processes = [Uuids,
 		 HttpSessionHooks, 
 		 HttpSessionServer,
+		 AuthServer,
 		 Web],
     {ok, {{one_for_one, 10, 10}, Processes}}.
