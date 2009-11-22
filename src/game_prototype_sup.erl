@@ -53,5 +53,19 @@ init([]) ->
     Web = {webmachine_mochiweb,
 	   {webmachine_mochiweb, start, [WebConfig]},
 	   permanent, 5000, worker, dynamic},
-    Processes = [Web],
+
+    Uuids = {uuids,
+	     {uuids, start, []},
+	     permanent, 5000, worker, dynamic},
+    HttpSessionHooks = {hooks,
+			{hooks, start_link,  [http_session_hooks]},
+			permanent, 5000, worker, dynamic},
+    HttpSessionServer = {http_session_server,
+			 {http_session_server, start_link, []},
+			 permanent, 5000, worker, dynamic},
+
+    Processes = [Uuids,
+		 HttpSessionHooks, 
+		 HttpSessionServer,
+		 Web],
     {ok, {{one_for_one, 10, 10}, Processes}}.

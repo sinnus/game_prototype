@@ -14,9 +14,22 @@
 %% @doc application start callback for game_prototype.
 start(_Type, _StartArgs) ->
     game_prototype_deps:ensure(),
+    db_init(),
+    auth_internal:start(),
     game_prototype_sup:start_link().
 
 %% @spec stop(_State) -> ServerRet
 %% @doc application stop callback for game_prototype.
 stop(_State) ->
+    application:stop(mnesia),
     ok.
+
+db_init() ->
+    case mnesia:system_info(extra_db_nodes) of
+	[] ->
+	    mnesia:create_schema([node()]);
+	_ ->
+	    ok
+    end,
+    application:start(mnesia, permanent),
+    mnesia:wait_for_tables(mnesia:system_info(local_tables), infinity).
