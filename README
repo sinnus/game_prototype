@@ -1,0 +1,6 @@
+How to build:
+
+1. Get webmachine (hg clone http://bitbucket.org/justin/webmachine/)
+2. Compile webmachine
+3. Make symbolink link between webmachine and deps/webmachine
+4. Make project
