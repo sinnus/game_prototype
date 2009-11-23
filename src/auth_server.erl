@@ -13,7 +13,7 @@
 
 %% API
 -export([start_link/0, register_new_session/3, check_by_ssid/2,
-	 get_all_sessions/2, stop/1, remove_session/2]).
+	 get_all_sessions/2, stop/1, remove_session/2, get_login_by_ssid/2]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -42,6 +42,9 @@ register_new_session(ServerLink, SessionId, Login) ->
 
 check_by_ssid(ServerLink, SessionId) ->
     gen_server:call(ServerLink, {check_by_ssid, SessionId}, infinity).
+
+get_login_by_ssid(ServerLink, Ssid) ->
+    gen_server:call(ServerLink, {get_login_by_ssid, Ssid}, infinity).
 
 remove_session(ServerLink, SessionId) ->
     gen_server:call(ServerLink, {remove_session, SessionId}, infinity).
@@ -87,6 +90,15 @@ handle_call({check_by_ssid, SessionId}, _From, State) ->
 handle_call({remove_session, SessionId}, _From, State) ->
     do_remove_session(SessionId, State),
     {reply, ok, State};
+
+handle_call({get_login_by_ssid, Ssid}, _From, State) ->
+    Reply = case ets:lookup(State#state.ssid2login_set, Ssid) of
+		[Row] ->
+		    Row#auth_info.login;
+		[] ->
+		    undefined
+	    end,
+    {reply, Reply, State};
 
 %% Can return huge information data
 handle_call({get_all_sessions, Login}, _From, State) ->

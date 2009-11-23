@@ -48,6 +48,12 @@ server_test() ->
     check_sessions(auth_server:get_all_sessions(Pid, "username2"),
 		   []),
 
+    auth_server:register_new_session(Pid, "session10", "sinnus"),
+    Login = auth_server:get_login_by_ssid(Pid, "session10"),
+    ?assert(Login =:= "sinnus"),
+    LoginUndef = auth_server:get_login_by_ssid(Pid, "unknown"),
+    ?assert(LoginUndef =:= undefined),
+
     auth_server:stop(Pid),
     ok.
 
