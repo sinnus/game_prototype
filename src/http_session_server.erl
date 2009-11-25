@@ -235,6 +235,7 @@ do_remove_expired_session(SessionId, State) ->
 	[HttpSessionRow] ->
 	    Now = gnow_utc(),
 	    if
+		%% FIXME: Timeout value must be in milleseconds!!!
 		(HttpSessionRow#http_session.last_access_time + ?SESSION_TIMEOUT) =< Now ->
 		    ?DEBUG("Timeout occurred for SesionId ~p", [SessionId]),
 		    Result = do_remove_session(State#state.ssid_set, SessionId),
