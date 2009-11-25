@@ -244,7 +244,9 @@ do_remove_expired_session(SessionId, State) ->
 			    Result;
 			no_session ->
 			    Result
-		    end
+		    end;
+		true ->
+		    no_session
 	    end
     end.
 
