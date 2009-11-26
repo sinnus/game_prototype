@@ -40,14 +40,25 @@ process_post(RD, Ctx) ->
 			  ?DEBUG("Constraint violated", []),
 			  error_to_resp(?INVALID_JSON_FORMAT_MSG, Id, RD2);
 		     true ->
-			  case apply(?MODULE, do_call, [{Method, Params}]) of
+			  ResultTuple = try
+					    apply(?MODULE, do_call, [{Method, Params}])
+					catch
+					    error:Reason ->
+						StackTrace = erlang:get_stacktrace(),
+						ErrorMsg = io_lib:format("Couldn't execute method. Reason:~n~p",
+									 [[Reason, StackTrace]]),
+						?ERROR_MSG("Execution of JSON-RPC method ~p failed with reason:~n~p",
+							   [Method, [Reason, StackTrace]]),
+						{error, erlang:iolist_to_binary(ErrorMsg)}
+					end,
+			  case ResultTuple of
 			      {result, ResultJson} ->
 				  result_to_resp(ResultJson, Id, RD2);
 			      {error, ErrorJson} ->
 				  error_to_resp(ErrorJson, Id, RD2)
 			  end
 		  end;
-	      Data ->
+	      _ ->
 		  ?DEBUG("Invalid JSON format", []),
 		  error_to_resp(?INVALID_JSON_FORMAT_MSG, null, RD2)
 	  end,
@@ -66,6 +77,7 @@ error_to_resp(ErrorJson, Id, RD) ->
     wrq:append_to_resp_body([Json], RD).
 
 do_call({<<"removeFiles">>, Params}) ->
+    A = 0 / 0,
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
 do_call({Method, _Params}) ->
