@@ -67,14 +67,14 @@ process_post(RD, Ctx) ->
 
 result_to_resp(ResultJson, Id, RD) ->
     Json = mochijson2:encode({struct, [{<<"result">>, ResultJson},
-				{<<"error">>, null},
-				{<<"id">>, Id}]}),
+				       {<<"error">>, null},
+				       {<<"id">>, Id}]}),
     wrq:append_to_resp_body([Json], RD).
-    
+
 error_to_resp(ErrorJson, Id, RD) ->
     Json = mochijson2:encode({struct, [{<<"result">>, null},
-				{<<"error">>, ErrorJson},
-				{<<"id">>, Id}]}),
+				       {<<"error">>, ErrorJson},
+				       {<<"id">>, Id}]}),
     wrq:append_to_resp_body([Json], RD).
 
 do_call({<<"removeFiles">>, Params, Ctx}) ->
