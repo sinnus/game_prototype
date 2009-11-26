@@ -40,12 +40,12 @@ process_post(RD, Ctx) ->
 			  ?DEBUG("Constraint violated", []),
 			  error_to_resp(?INVALID_JSON_FORMAT_MSG, Id, RD2);
 		     true ->
-			  Json = case apply(?MODULE, do_call, [{Method, Params}]) of
-				     {result, ResultJson} ->
-					 result_to_resp(ResultJson, Id, RD2);
-				     {error, ErrorJson} ->
-					 error_to_resp(ErrorJson, Id, RD2)
-				 end
+			  case apply(?MODULE, do_call, [{Method, Params}]) of
+			      {result, ResultJson} ->
+				  result_to_resp(ResultJson, Id, RD2);
+			      {error, ErrorJson} ->
+				  error_to_resp(ErrorJson, Id, RD2)
+			  end
 		  end;
 	      Data ->
 		  ?DEBUG("Invalid JSON format", []),
