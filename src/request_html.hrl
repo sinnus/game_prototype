@@ -17,6 +17,5 @@ charsets_provided(ReqData, Context) ->
     {[{"utf-8", fun(X) -> X end}], ReqData, Context}.
 
 to_html(ReqData, Context) ->
-    ?DEBUG("SAAAAA", []),
     {ReqData1, Context1} = http_context:ensure_session_id(ReqData, Context),
     html(ReqData1, Context1).
