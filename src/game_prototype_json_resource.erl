@@ -77,7 +77,10 @@ error_to_resp(ErrorJson, Id, RD) ->
     wrq:append_to_resp_body([Json], RD).
 
 do_call({<<"removeFiles">>, Params}) ->
-    A = 0 / 0,
+    {result, {struct, [{<<"username">>, <<"фио">>}]}};
+
+do_call({<<"fail">>, Params}) ->
+    _A = 0 / 0,
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
 do_call({Method, _Params}) ->
