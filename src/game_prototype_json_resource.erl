@@ -10,7 +10,7 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 -include("common.hrl").
--define(INVALID_JSON_FORMAT_MSG, <<"Invalid JSON format">>).
+-define(INVALID_JSON_RPC_FORMAT_MSG, <<"Invalid JSON-RPC format">>).
 
 init(_DispatchArgs) ->
     {ok, #http_context{}}.
@@ -37,8 +37,9 @@ process_post(RD, Ctx) ->
 		  if (Method =:= undefined) orelse
 		     (Params =:= undefined) orelse
 		     (Id =:= undefined) ->
-			  ?DEBUG("Constraint violated", []),
-			  error_to_resp(?INVALID_JSON_FORMAT_MSG, Id, RD2);
+			  ?DEBUG("Invalid JSON-RPC format. Method: ~p, Params: ~p, Id: ~p",
+				 [Method, Params, Id]),
+			  error_to_resp(?INVALID_JSON_RPC_FORMAT_MSG, Id, RD2);
 		     true ->
 			  ResultTuple = try
 					    apply(?MODULE, do_call, [{Method, Params}])
@@ -59,8 +60,8 @@ process_post(RD, Ctx) ->
 			  end
 		  end;
 	      _ ->
-		  ?DEBUG("Invalid JSON format", []),
-		  error_to_resp(?INVALID_JSON_FORMAT_MSG, null, RD2)
+		  ?DEBUG("Invalid JSON-RPC format", []),
+		  error_to_resp(?INVALID_JSON_RPC_FORMAT_MSG, null, RD2)
 	  end,
     {true, RD3, Ctx1}.
 
@@ -84,4 +85,7 @@ do_call({<<"fail">>, Params}) ->
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
 do_call({Method, _Params}) ->
-    ?DEBUG("Method ~p doesn't exist", [Method]).
+    ErrorMessage = io_lib:format("Method ~p doesn't exist", [Method]),
+    ?DEBUG(ErrorMessage, []),
+    {error, erlang:iolist_to_binary(ErrorMessage)}.
+
