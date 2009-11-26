@@ -42,7 +42,7 @@ process_post(RD, Ctx) ->
 			  error_to_resp(?INVALID_JSON_RPC_FORMAT_MSG, Id, RD2);
 		     true ->
 			  ResultTuple = try
-					    apply(?MODULE, do_call, [{Method, Params}])
+					    apply(?MODULE, do_call, [{Method, Params, Ctx1}])
 					catch
 					    error:Reason ->
 						StackTrace = erlang:get_stacktrace(),
@@ -77,14 +77,17 @@ error_to_resp(ErrorJson, Id, RD) ->
 				{<<"id">>, Id}]}),
     wrq:append_to_resp_body([Json], RD).
 
-do_call({<<"removeFiles">>, Params}) ->
+do_call({<<"removeFiles">>, Params, Ctx}) ->
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
-do_call({<<"fail">>, Params}) ->
+do_call({<<"getSsid">>, Params, Ctx}) ->
+    {result, Ctx#http_context.ssid};
+
+do_call({<<"fail">>, Params, Ctx}) ->
     _A = 0 / 0,
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
-do_call({Method, _Params}) ->
+do_call({Method, _Params, Ctx}) ->
     ErrorMessage = io_lib:format("Method ~p doesn't exist", [Method]),
     ?DEBUG(ErrorMessage, []),
     {error, erlang:iolist_to_binary(ErrorMessage)}.
