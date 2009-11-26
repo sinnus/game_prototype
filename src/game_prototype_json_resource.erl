@@ -10,6 +10,7 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 -include("common.hrl").
+-define(INVALID_JSON_FORMAT_MSG, <<"Invalid JSON format">>).
 
 init(_DispatchArgs) ->
     {ok, #http_context{}}.
@@ -37,28 +38,35 @@ process_post(RD, Ctx) ->
 		     (Params =:= undefined) orelse
 		     (Id =:= undefined) ->
 			  ?DEBUG("Constraint violated", []),
-			  RD2;
+			  error_to_resp(?INVALID_JSON_FORMAT_MSG, Id, RD2);
 		     true ->
 			  Json = case apply(?MODULE, do_call, [{Method, Params}]) of
 				     {result, ResultJson} ->
-					 mochijson2:encode({struct, [{<<"result">>, ResultJson},
-								     {<<"error">>, null},
-								     {<<"id">>, Id}]});
+					 result_to_resp(ResultJson, Id, RD2);
 				     {error, ErrorJson} ->
-					 mochijson2:encode({struct, [{<<"result">>, null},
-								      {<<"error">>, ErrorJson},
-								      {<<"id">>, Id}]})
-				 end,
-			  wrq:append_to_resp_body([Json], RD2)
+					 error_to_resp(ErrorJson, Id, RD2)
+				 end
 		  end;
 	      Data ->
-		  ?DEBUG("Couldn't parse: ~p", [Data]),
-		  RD2
-    end,
+		  ?DEBUG("Invalid JSON format", []),
+		  error_to_resp(?INVALID_JSON_FORMAT_MSG, null, RD2)
+	  end,
     {true, RD3, Ctx1}.
 
+result_to_resp(ResultJson, Id, RD) ->
+    Json = mochijson2:encode({struct, [{<<"result">>, ResultJson},
+				{<<"error">>, null},
+				{<<"id">>, Id}]}),
+    wrq:append_to_resp_body([Json], RD).
+    
+error_to_resp(ErrorJson, Id, RD) ->
+    Json = mochijson2:encode({struct, [{<<"result">>, null},
+				{<<"error">>, ErrorJson},
+				{<<"id">>, Id}]}),
+    wrq:append_to_resp_body([Json], RD).
+
 do_call({<<"removeFiles">>, Params}) ->
-    {result, {struct, [{<<"username">>, <<"sinnus">>}]}};
+    {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
 do_call({Method, _Params}) ->
     ?DEBUG("Method ~p doesn't exist", [Method]).
