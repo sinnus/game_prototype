@@ -11,6 +11,7 @@
 -include_lib("webmachine/include/webmachine.hrl").
 -include("common.hrl").
 -define(INVALID_JSON_RPC_FORMAT_MSG, <<"Invalid JSON-RPC format">>).
+-define(INVALID_JSON_FORMAT_MSG, <<"Invalid JSON format">>).
 
 init(_DispatchArgs) ->
     {ok, #http_context{}}.
@@ -27,7 +28,13 @@ allowed_methods(ReqData, Context) ->
 %% curl -X POST http://localhost:8000/json -d '{"method": "removeFiles", "id": "aa", "params": ["world", {"a": 1}]}'
 process_post(RD, Ctx) ->
     {RD1, Ctx1} = http_context:ensure_session_id(RD, Ctx),
-    JsonData = mochijson2:decode(wrq:req_body(RD)),
+    JsonData = try
+		   mochijson2:decode(wrq:req_body(RD))
+	       catch
+		   error:ReasonParse ->
+		       ?DEBUG("Couldn't parse json post data: ~p", [[ReasonParse, erlang:get_stacktrace()]]),
+		       undefined
+	       end,
     RD2 = wrq:set_resp_header("Content-Type", "application/json; charset=utf-8", RD1),
     RD3 = case JsonData of
 	      {struct, Data} ->
@@ -46,10 +53,10 @@ process_post(RD, Ctx) ->
 					catch
 					    error:Reason ->
 						StackTrace = erlang:get_stacktrace(),
-						ErrorMsg = io_lib:format("Couldn't execute method. Reason:~n~p",
-									 [[Reason, StackTrace]]),
 						?ERROR_MSG("Execution of JSON-RPC method ~p failed with reason:~n~p",
 							   [Method, [Reason, StackTrace]]),
+						ErrorMsg = io_lib:format("Couldn't execute method. Reason:~n~p",
+									 [[Reason, StackTrace]]),
 						{error, erlang:iolist_to_binary(ErrorMsg)}
 					end,
 			  case ResultTuple of
@@ -59,6 +66,8 @@ process_post(RD, Ctx) ->
 				  error_to_resp(ErrorJson, Id, RD2)
 			  end
 		  end;
+	      undefined ->
+		  error_to_resp(?INVALID_JSON_FORMAT_MSG, null, RD2);
 	      _ ->
 		  ?DEBUG("Invalid JSON-RPC format", []),
 		  error_to_resp(?INVALID_JSON_RPC_FORMAT_MSG, null, RD2)
@@ -77,17 +86,17 @@ error_to_resp(ErrorJson, Id, RD) ->
 				       {<<"id">>, Id}]}),
     wrq:append_to_resp_body([Json], RD).
 
-do_call({<<"removeFiles">>, Params, Ctx}) ->
+do_call({<<"removeFiles">>, _Params, _Ctx}) ->
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
-do_call({<<"getSsid">>, Params, Ctx}) ->
+do_call({<<"getSsid">>, _Params, Ctx}) ->
     {result, Ctx#http_context.ssid};
 
-do_call({<<"fail">>, Params, Ctx}) ->
+do_call({<<"fail">>, _Params, _Ctx}) ->
     _A = 0 / 0,
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
-do_call({Method, _Params, Ctx}) ->
+do_call({Method, _Params, _Ctx}) ->
     ErrorMessage = io_lib:format("Method ~p doesn't exist", [Method]),
     ?DEBUG(ErrorMessage, []),
     {error, erlang:iolist_to_binary(ErrorMessage)}.
