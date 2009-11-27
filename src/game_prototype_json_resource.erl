@@ -5,13 +5,13 @@
 -export([init/1,
 	 charsets_provided/2,
 	 allowed_methods/2,
-	 do_call/1,
 	 process_post/2]).
 
 -include_lib("webmachine/include/webmachine.hrl").
 -include("common.hrl").
 -define(INVALID_JSON_RPC_FORMAT_MSG, <<"Invalid JSON-RPC format">>).
 -define(INVALID_JSON_FORMAT_MSG, <<"Invalid JSON format">>).
+-define(JSON_HANDLER_MODULE, game_prototype_json_handler).
 
 init(_DispatchArgs) ->
     {ok, #http_context{}}.
@@ -49,7 +49,7 @@ process_post(RD, Ctx) ->
 			  error_to_resp(?INVALID_JSON_RPC_FORMAT_MSG, Id, RD2);
 		     true ->
 			  ResultTuple = try
-					    apply(?MODULE, do_call, [{Method, Params, Ctx1}])
+					    apply(?JSON_HANDLER_MODULE, do_call, [{Method, Params, Ctx1}])
 					catch
 					    error:Reason ->
 						StackTrace = erlang:get_stacktrace(),
@@ -85,19 +85,3 @@ error_to_resp(ErrorJson, Id, RD) ->
 				       {<<"error">>, ErrorJson},
 				       {<<"id">>, Id}]}),
     wrq:append_to_resp_body([Json], RD).
-
-do_call({<<"removeFiles">>, _Params, _Ctx}) ->
-    {result, {struct, [{<<"username">>, <<"фио">>}]}};
-
-do_call({<<"getSsid">>, _Params, Ctx}) ->
-    {result, Ctx#http_context.ssid};
-
-do_call({<<"fail">>, _Params, _Ctx}) ->
-    _A = 0 / 0,
-    {result, {struct, [{<<"username">>, <<"фио">>}]}};
-
-do_call({Method, _Params, _Ctx}) ->
-    ErrorMessage = io_lib:format("Method ~p doesn't exist", [Method]),
-    ?DEBUG(ErrorMessage, []),
-    {error, erlang:iolist_to_binary(ErrorMessage)}.
-
