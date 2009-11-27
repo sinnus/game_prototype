@@ -27,6 +27,14 @@ allowed_methods(ReqData, Context) ->
 %%        -d "one=two&me=pope"
 %% curl -X POST http://localhost:8000/json -d '{"method": "removeFiles", "id": "aa", "params": ["world", {"a": 1}]}'
 process_post(RD, Ctx) ->
+    case wrq:get_req_header("content-type", RD) of
+        "application/x-www-form-urlencoded" ++ _ ->
+	    do_process_post(RD, Ctx);
+	_ ->
+	    {false, RD, Ctx}
+    end.
+
+do_process_post(RD, Ctx) ->
     {RD1, Ctx1} = http_context:ensure_session_id(RD, Ctx),
     JsonData = try
 		   mochijson2:decode(wrq:req_body(RD))
