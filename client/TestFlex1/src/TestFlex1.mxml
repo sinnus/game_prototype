@@ -21,7 +21,14 @@
 			    var loader:URLLoader = URLLoader(event.target);
 				var rawData:String = String(loader.data);
 				var jsonResult:Object = JSON.decode(rawData);
-				Alert.show(jsonResult.result.username);
+				if (jsonResult.error == null)
+				{
+				    Alert.show(jsonResult.result.username, "Result");
+				}
+				else
+				{
+				    Alert.show(jsonResult.error, "Error");
+				}
 			}
 		]]>
 	</mx:Script>
