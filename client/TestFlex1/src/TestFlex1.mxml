@@ -1,35 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:net="flash.net.*">
-	<mx:Button id="btn1" label="POST" click="onClick()"/>
-	<mx:Script>
-		<![CDATA[
-		    import com.adobe.serialization.json.JSON;
-			import mx.controls.Alert;
-			
-			private function onClick():void
-			{
-			    var req:URLRequest = new URLRequest("http://localhost:8000/json");
-			    req.method = URLRequestMethod.POST;
-			    req.data = '{"method": "removeFiles", "id": null, "params": []}';
-			    var loader:URLLoader = new URLLoader();
-			    loader.addEventListener(Event.COMPLETE, handleComplete);
-			    loader.load(req);
-			} 
-			
-			private function handleComplete(event:Event):void
-			{
-			    var loader:URLLoader = URLLoader(event.target);
-				var rawData:String = String(loader.data);
-				var jsonResult:Object = JSON.decode(rawData);
-				if (jsonResult.error == null)
-				{
-				    Alert.show(jsonResult.result.username, "Result");
-				}
-				else
-				{
-				    Alert.show(jsonResult.error, "Error");
-				}
-			}
-		]]>
-	</mx:Script>
+    <mx:Button id="btn1" label="POST" click="onClick()"/>
+    <mx:Script>
+        <![CDATA[
+            import org.my.jsonrpc.FaultEvent;
+            import org.my.jsonrpc.ResultEvent;
+            import org.my.jsonrpc.JSONHTTPService;
+            import com.adobe.serialization.json.JSON;
+            import mx.controls.Alert;
+
+            private var jsonService:JSONHTTPService = new JSONHTTPService();
+
+            private function onClick():void
+            {
+                jsonService.callService("removeFiles", [], resultHanlder, faultHandler);
+            }
+
+            private function faultHandler(event:FaultEvent):void
+            {
+                Alert.show(event.fault.message, "Error");
+            }
+
+            private function resultHanlder(event:ResultEvent):void
+            {
+                Alert.show(event.result.username, "Result");
+            }
+        ]]>
+    </mx:Script>
 </mx:Application>
