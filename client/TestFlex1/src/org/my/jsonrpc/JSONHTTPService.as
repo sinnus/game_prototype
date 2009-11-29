@@ -6,17 +6,22 @@ package org.my.jsonrpc
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
 
+    import mx.utils.UIDUtil;
+
     public class JSONHTTPService extends EventDispatcher
     {
-        public function JSONHTTPService()
+        private var _url:String;
+
+        public function JSONHTTPService(url:String)
         {
             super();
+            _url = url;
         }
 
         public function callService(method:String, args:Array,
                                     resultHandler:Function = null,  faultHandler:Function = null):void
         {
-            var req:URLRequest = new URLRequest("http://localhost:8000/json");
+            var req:URLRequest = new URLRequest(_url);
             req.method = URLRequestMethod.POST;
             var message:String = JSON.encode(args);
             req.data = '{"method": "' + method + '", "id": null, "params": [' + message + ']}';
@@ -25,5 +30,11 @@ package org.my.jsonrpc
             jsonResponder.faultCallback = faultHandler;
             jsonResponder.load(req);
         }
+
+        public function get url():String
+        {
+            return _url;
+        }
+
     }
 }

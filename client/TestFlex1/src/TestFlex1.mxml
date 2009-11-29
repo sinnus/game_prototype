@@ -9,7 +9,7 @@
             import com.adobe.serialization.json.JSON;
             import mx.controls.Alert;
 
-            private var jsonService:JSONHTTPService = new JSONHTTPService();
+            private var jsonService:JSONHTTPService = new JSONHTTPService("http://localhost:8000/json");
 
             private function onClick():void
             {
