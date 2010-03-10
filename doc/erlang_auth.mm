@@ -29,20 +29,10 @@
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node CREATED="1267873095307" ID="Freemind_Link_205665734" MODIFIED="1267875269940" TEXT="&#x41c;&#x43e;&#x434;&#x443;&#x43b;&#x44c; &#x430;&#x443;&#x442;&#x435;&#x43d;&#x442;&#x438;&#x444;&#x438;&#x43a;&#x430;&#x446;&#x438;&#x438;">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node CREATED="1267874252736" ID="Freemind_Link_990306182" MODIFIED="1267874805122" TEXT="&#x420;&#x435;&#x433;&#x438;&#x441;&#x442;&#x440;&#x430;&#x446;&#x438;&#x44f; &#x430;&#x43a;&#x430;&#x443;&#x43d;&#x442;&#x430;">
+<node CREATED="1267874252736" ID="Freemind_Link_990306182" MODIFIED="1268251776576" TEXT="&#x421;&#x43e;&#x437;&#x434;&#x430;&#x43d;&#x438;&#x435; &#x430;&#x43a;&#x430;&#x443;&#x43d;&#x442;&#x430; &#x432; &#x411;&#x414; (Account)">
 <node CREATED="1268073673490" ID="Freemind_Link_919909888" MODIFIED="1268076565446" TEXT="&#x421;&#x43e;&#x437;&#x434;&#x430;&#x435;&#x442; &#x437;&#x430;&#x43f;&#x438;&#x441;&#x44c; Account &#x432; &#x411;&#x414;"/>
-<node CREATED="1267874270891" ID="Freemind_Link_88896620" MODIFIED="1267874971067" TEXT="&#x41f;&#x43e; &#x442;&#x438;&#x43f;&#x443; &#x440;&#x435;&#x433;&#x438;&#x441;&#x442;&#x440;&#x430;&#x446;&#x438;&#x438;&#xa;&#x432;&#x44b;&#x431;&#x438;&#x440;&#x430;&#x435;&#x442; &#x43f;&#x440;&#x43e;&#x432;&#x430;&#x439;&#x434;&#x435;&#x440;&#xa;&#x438; &#x440;&#x435;&#x433;&#x438;&#x441;&#x442;&#x440;&#x438;&#x440;&#x443;&#x435;&#x442; &#x447;&#x435;&#x440;&#x435;&#x437;&#xa;&#x43f;&#x440;&#x43e;&#x432;&#x430;&#x439;&#x434;&#x435;&#x440; &#x430;&#x43a;&#x430;&#x443;&#x43d;&#x442;">
-<node CREATED="1268076027238" ID="Freemind_Link_757180430" MODIFIED="1268076035996" TEXT="auth_provider#register">
-<node CREATED="1268076038774" ID="Freemind_Link_429610801" MODIFIED="1268076042289" TEXT="{ok, true}"/>
-<node CREATED="1268076044750" ID="Freemind_Link_834045168" MODIFIED="1268076052118" TEXT="{error, not_allowed}"/>
-</node>
-<node CREATED="1268076603273" ID="Freemind_Link_1748413041" MODIFIED="1268076639078" TEXT="&#x421;&#x43e;&#x437;&#x434;&#x430;&#x43d;&#x438;&#x435; &#x437;&#x430;&#x43f;&#x438;&#x441;&#x438; Account &#x432; DB&#xa;&#x438; &#x432; auth_provider#registration&#xa;&#x434;&#x43e;&#x43b;&#x436;&#x43d;&#x43e; &#x438;&#x434;&#x442;&#x438; &#x430;&#x442;&#x43e;&#x43c;&#x430;&#x440;&#x43d;&#x43e; (&#x432; &#x442;&#x440;&#x430;&#x43d;&#x437;&#x430;&#x43a;&#x446;&#x438;&#x438;)"/>
-</node>
 <node CREATED="1268074162667" ID="Freemind_Link_1842862302" MODIFIED="1268074171271" TEXT="&#x41f;&#x440;&#x438;&#x432;&#x44f;&#x437;&#x44b;&#x432;&#x430;&#x435;&#x442; &#x440;&#x43e;&#x43b;&#x44c; &#x43f;&#x43e;-&#x443;&#x43c;&#x43e;&#x43b;&#x447;&#x430;&#x43d;&#x438;&#x44e;"/>
-<node CREATED="1268074866366" ID="Freemind_Link_1426088739" MODIFIED="1268074878208" TEXT="&#x421;&#x43e;&#x437;&#x434;&#x430;&#x435;&#x442; event &#x447;&#x435;&#x440;&#x435;&#x437; Hooks"/>
-<node CREATED="1268076788986" ID="Freemind_Link_960884195" MODIFIED="1268076867780" TEXT="&#x412;&#x43e;&#x437;&#x43c;&#x43e;&#x436;&#x43d;&#x43e;, &#x441;&#x434;&#x435;&#x43b;&#x430;&#x442;&#x44c; &#x430;&#x442;&#x440;&#x438;&#x431;&#x443;&#x442; Account#password&#xa;&#x438;, &#x435;&#x441;&#x43b;&#x438; auth_provider#registration &#x432;&#x435;&#x440;&#x43d;&#x443;&#x43b;&#xa;{ok, true}, &#x442;&#x43e; &#x437;&#x430;&#x43f;&#x43e;&#x43b;&#x43d;&#x44f;&#x442;&#x44c; password, &#x430; &#x438;&#x43d;&#x430;&#x447;&#x435; &#x43e;&#x441;&#x442;&#x430;&#x432;&#x43b;&#x44f;&#x442;&#x44c;&#xa;&#x43f;&#x443;&#x441;&#x442;&#x44b;&#x43c;">
-<icon BUILTIN="help"/>
-</node>
+<node CREATED="1268251712924" ID="Freemind_Link_1589884929" MODIFIED="1268251719010" TEXT="&#x413;&#x435;&#x43d;&#x435;&#x440;&#x438;&#x440;&#x443;&#x435;&#x442; &#x435;&#x432;&#x435;&#x43d;&#x442; &#x447;&#x435;&#x440;&#x435;&#x437; hooks"/>
 </node>
 <node CREATED="1267881205023" ID="Freemind_Link_709742375" MODIFIED="1267881214402" TEXT="&#x41b;&#x43e;&#x433;&#x438;&#x43d; &#x430;&#x43a;&#x430;&#x443;&#x43d;&#x442;&#x430;">
 <node CREATED="1268074181953" ID="Freemind_Link_482298271" MODIFIED="1268074236317" TEXT="&#x412;&#x44b;&#x431;&#x43e;&#x440; &#x43f;&#x43e; &#x442;&#x438;&#x43f;&#x443; &#x43b;&#x43e;&#x433;&#x438;&#x43d;&#x430; AuthProvider"/>
@@ -59,8 +49,8 @@
 <node CREATED="1268074414425" ID="Freemind_Link_1428506308" MODIFIED="1268074438210" TEXT="&#x41f;&#x440;&#x43e;&#x432;&#x435;&#x440;&#x43a;&#x430;, &#x435;&#x441;&#x442;&#x438; &#x43b;&#x438; &#x430;&#x43a;&#x43a;&#x430;&#x443;&#x43d;&#x442; &#x432; &#x411;&#x414; &#x430;&#x443;&#x442;&#x435;&#x43d;&#x442;&#x438;&#x444;&#x438;&#x43a;&#x430;&#x446;&#x438;&#x438;">
 <node CREATED="1268083779183" ID="Freemind_Link_1304640102" MODIFIED="1268083783207" TEXT="true"/>
 <node CREATED="1268083786551" ID="Freemind_Link_60827714" MODIFIED="1268083788925" TEXT="false">
-<node CREATED="1268083792175" ID="Freemind_Link_1943527306" MODIFIED="1268083806137" TEXT="&#x421;&#x43e;&#x437;&#x434;&#x430;&#x43d;&#x438;&#x435; Account &#x432; DB">
-<icon BUILTIN="help"/>
+<node CREATED="1268251580293" ID="Freemind_Link_561636712" MODIFIED="1268251748960" TEXT="&#x415;&#x441;&#x43b;&#x438; AuthProvider &#x43d;&#x435; &#x43f;&#x43e;&#x434;&#x434;&#x435;&#x440;&#x436;&#x438;&#x432;&#x430;&#x435;&#x442;&#xa;&#x440;&#x435;&#x433;&#x438;&#x441;&#x442;&#x440;&#x430;&#x446;&#x438;&#x44e;, &#x442;&#x43e; &#x441;&#x43e;&#x437;&#x434;&#x430;&#x435;&#x442;&#x441;&#x44f; &#x430;&#x43a;&#x43a;&#x430;&#x443;&#x43d;&#x442; &#x432; &#x411;&#x414;">
+<arrowlink DESTINATION="Freemind_Link_990306182" ENDARROW="Default" ENDINCLINATION="662;0;" ID="Freemind_Arrow_Link_1812479661" STARTARROW="None" STARTINCLINATION="662;0;"/>
 </node>
 </node>
 </node>
