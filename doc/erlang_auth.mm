@@ -81,7 +81,7 @@
 <node CREATED="1267886010349" ID="Freemind_Link_1129201163" MODIFIED="1267886025646" TEXT="&#x41f;&#x440;&#x43e;&#x432;&#x435;&#x440;&#x43a;&#x430; Permission &#x434;&#x43b;&#x44f; &#x430;&#x43a;&#x430;&#x443;&#x43d;&#x442;&#x430;"/>
 <node CREATED="1268075342675" ID="Freemind_Link_89134911" MODIFIED="1268075355410" TEXT="AuthProvider API">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node CREATED="1268075364835" ID="Freemind_Link_1192804776" MODIFIED="1268075477815" TEXT="authenticate(account_id, auth_key):bool">
+<node CREATED="1268075364835" ID="Freemind_Link_1192804776" MODIFIED="1269102420692" TEXT="authenticate(account_id, auth_key, auth_type):bool">
 <node CREATED="1268075490346" ID="Freemind_Link_1908484840" MODIFIED="1268075510009" TEXT="auth_key">
 <node CREATED="1268075512707" ID="Freemind_Link_1482725363" MODIFIED="1268075521782" TEXT="standalone">
 <node CREATED="1268075532323" ID="Freemind_Link_295652938" MODIFIED="1268075534707" TEXT="password"/>
@@ -92,13 +92,18 @@
 </node>
 </node>
 </node>
-<node CREATED="1268075444771" ID="Freemind_Link_72362171" MODIFIED="1268075811325" TEXT="register(account_id, auth_key):result">
+<node CREATED="1268075444771" ID="Freemind_Link_72362171" MODIFIED="1269101973916" TEXT="register(account_id, auth_key):result">
+<icon BUILTIN="help"/>
 <node CREATED="1268075813438" ID="Freemind_Link_992215741" MODIFIED="1268075890432" TEXT="{error, not_allowed} - &#x434;&#x43b;&#x44f; vkontatke"/>
 <node CREATED="1268075827482" ID="Freemind_Link_634784186" MODIFIED="1268075883537" TEXT="{ok, true} - &#x434;&#x43b;&#x44f; internal"/>
 <node CREATED="1268076158302" ID="Freemind_Link_449491544" MODIFIED="1268076172671" TEXT="{error, wrong_auth_key}"/>
 <node CREATED="1268076144619" ID="Freemind_Link_19123711" MODIFIED="1268076155581" TEXT="register &#x43f;&#x440;&#x43e;&#x432;&#x435;&#x440;&#x44f;&#x435;&#x442; &#x432;&#x430;&#x43b;&#x438;&#x434;&#x43d;&#x43e;&#x441;&#x442;&#x44c; &#x43f;&#x430;&#x440;&#x43e;&#x43b;&#x44f; &#x438; &#x442;.&#x434;."/>
 </node>
-<node CREATED="1268075758909" ID="Freemind_Link_1726749061" MODIFIED="1268075769298" TEXT="is_user_exist(account_id):bool"/>
+<node CREATED="1268075758909" ID="Freemind_Link_1726749061" MODIFIED="1269102727152" TEXT="is_user_exist(account_id):bool">
+<icon BUILTIN="help"/>
+</node>
+<node CREATED="1269101659564" ID="Freemind_Link_1903303037" MODIFIED="1269101661746" TEXT="start"/>
+<node CREATED="1269102732309" ID="Freemind_Link_266810762" MODIFIED="1269102734372" TEXT="stop"/>
 </node>
 </node>
 <node CREATED="1267875250743" ID="Freemind_Link_852517130" MODIFIED="1267875261890" TEXT="&#x41a;&#x43b;&#x438;&#x435;&#x43d;&#x442; &#x430;&#x443;&#x442;&#x435;&#x43d;&#x442;&#x438;&#x444;&#x438;&#x43a;&#x430;&#x446;&#x438;&#x438;">
@@ -120,8 +125,8 @@
 </node>
 <node CREATED="1267875273833" ID="Freemind_Link_411833040" MODIFIED="1267875276511" TEXT="&#x421;&#x443;&#x449;&#x43d;&#x43e;&#x441;&#x442;&#x438;">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node CREATED="1267874389638" ID="Freemind_Link_364363675" MODIFIED="1267875078433" TEXT="Account entity">
-<node CREATED="1267874401004" ID="Freemind_Link_68688549" MODIFIED="1267874436344" TEXT="id:int"/>
+<node CREATED="1267874389638" ID="Freemind_Link_364363675" MODIFIED="1269101835841" TEXT="Account entity">
+<node CREATED="1267874401004" ID="Freemind_Link_68688549" MODIFIED="1269101852675" TEXT="id:int"/>
 <node CREATED="1267874404435" ID="Freemind_Link_285731715" MODIFIED="1267874439038" TEXT="type:int">
 <node CREATED="1267874529742" ID="Freemind_Link_739920998" MODIFIED="1267874532406" TEXT="standalone"/>
 <node CREATED="1267874534684" ID="Freemind_Link_148510759" MODIFIED="1267874536776" TEXT="facebook"/>
@@ -151,6 +156,9 @@
 <node CREATED="1267874844906" ID="Freemind_Link_1362096695" MODIFIED="1267874847977" TEXT="description:string"/>
 </node>
 <node CREATED="1268076518126" ID="Freemind_Link_306345097" MODIFIED="1268076524826" TEXT="StandaloneAccount:Account">
+<node CREATED="1269101753625" ID="Freemind_Link_301356973" MODIFIED="1269101852679" TEXT="account_id:int">
+<arrowlink DESTINATION="Freemind_Link_68688549" ENDARROW="Default" ENDINCLINATION="450;0;" ID="Freemind_Arrow_Link_1019488973" STARTARROW="None" STARTINCLINATION="450;0;"/>
+</node>
 <node CREATED="1268076527539" ID="Freemind_Link_621929059" MODIFIED="1268076532115" TEXT="password_md5:string"/>
 </node>
 </node>
