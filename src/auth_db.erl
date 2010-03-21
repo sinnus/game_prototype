@@ -11,7 +11,7 @@
 %%% API
 %%%----------------------------------------------------------------------
 start() ->
-    mnesia:create_table(account, [{disc_copies, []},
+    mnesia:create_table(account, [{disc_copies, [node()]},
 				  {attributes, record_info(fields, account)},
 				  {index, [account_ref_id, type]}]).
 

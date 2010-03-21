@@ -43,8 +43,8 @@ upgrade() ->
 init([]) ->
     Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
     {ok, Dispatch} = file:consult(filename:join(
-                         [filename:dirname(code:which(?MODULE)),
-                          "..", "priv", "dispatch.conf"])),
+				    [filename:dirname(code:which(?MODULE)),
+				     "..", "priv", "dispatch.conf"])),
     WebConfig = [
 		 {ip, Ip},
 		 {port, 8000},
@@ -67,7 +67,12 @@ init([]) ->
 		  {auth_server, start_link, []},
 		  permanent, 5000, worker, dynamic},
 
+    SeqServer = {sequence_server,
+		 {sequence_server, start_link, []},
+		 permanent, 5000, worker, dynamic},
+
     Processes = [Uuids,
+		 SeqServer,
 		 HttpSessionHooks, 
 		 HttpSessionServer,
 		 AuthServer,

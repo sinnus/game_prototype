@@ -26,9 +26,9 @@ get_sequence(Id) ->
     gen_server:call(?MODULE, {get_sequence, Id}).
 
 init([]) ->
-    mnesia:create_table(sequence, [{attributes, record_info(fields, sequence)},
-				   {type, ordered_set},
-				   {disc_copies, []}]),
+    mnesia:create_table(sequence, [{disc_copies, [node()]},
+				   {attributes, record_info(fields, sequence)},
+				   {type, ordered_set}]),
     {ok, #state{}}.
 
 handle_call({get_sequence, Id}, _From, State) ->
