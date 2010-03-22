@@ -1,6 +1,6 @@
 -module(auth_db).
 
--export([start/0, try_create_account/2]).
+-export([start/0, try_create_account/2, list_account_by_type/1]).
 
 -record(account, {id,
 		  account_ref_id, % Reference to external account storage
@@ -19,23 +19,23 @@ start() ->
 %% Result: created
 %%         exists
 try_create_account(AccountRefId, Type) ->
-F = fun() ->
-	    %% Maybe we should use dirty_index_read???
-	    case mnesia:index_read(account, AccountRefId, #account.account_ref_id) of
-		[] ->
-		    create_account(AccountRefId, Type);
-		Accounts ->
-		    case lists:filter(fun(Elem)  ->
+    F = fun() ->
+		%% Maybe we should use dirty_index_read???
+		case mnesia:index_read(account, AccountRefId, #account.account_ref_id) of
+		    [] ->
+			create_account(AccountRefId, Type);
+		    Accounts ->
+			case lists:filter(fun(Elem)  ->
 					      Elem#account.type =:= Type
-				      end, Accounts) of
-			[] ->
-			    create_account(AccountRefId, Type);
-			[_] ->
-			    %% TODO: log warning if length(Accounts) > 1
-			    exists
-		    end
-	    end
-    end,
+					  end, Accounts) of
+			    [] ->
+				create_account(AccountRefId, Type);
+			    [_] ->
+				%% TODO: log warning if length(Accounts) > 1
+				exists
+			end
+		end
+	end,
     {atomic, Result} = mnesia:transaction(F),
     Result.
 
@@ -48,3 +48,10 @@ create_account(AccountRefId, Type) ->
 	end,
     {atomic, _Result} = mnesia:transaction(F),
     created.
+
+list_account_by_type(Type) ->
+    F = fun() ->
+		mnesia:index_read(account, Type, #account.type)
+	end,
+    {atomic, Result} = mnesia:transaction(F),
+    Result.
