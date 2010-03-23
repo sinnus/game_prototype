@@ -31,6 +31,7 @@ init([]) ->
 				   {type, ordered_set}]),
     {ok, #state{}}.
 
+%% TODO: Maybe we should use dirty operations because service is atmoic
 handle_call({get_sequence, Id}, _From, State) ->
     F = fun() ->
 		Return = mnesia:read(sequence, Id, write),
