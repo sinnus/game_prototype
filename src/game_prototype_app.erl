@@ -16,7 +16,6 @@ start(_Type, _StartArgs) ->
     game_prototype_deps:ensure(),
     db_init(),
     auth_db:start(),
-    auth_internal:start(),
     game_prototype_sup:start_link().
 
 %% @spec stop(_State) -> ServerRet

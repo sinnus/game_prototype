@@ -71,10 +71,15 @@ init([]) ->
 		 {sequence_server, start_link, []},
 		 permanent, 5000, worker, dynamic},
 
+    AuthInternal = {auth_internal,
+		    {auth_internal, start_link, []},
+		    permanent, 5000, worker, dynamic},
+
     Processes = [Uuids,
 		 SeqServer,
 		 HttpSessionHooks, 
 		 HttpSessionServer,
 		 AuthServer,
+		 AuthInternal,
 		 Web],
     {ok, {{one_for_one, 10, 10}, Processes}}.

@@ -1,23 +1,38 @@
 -module(auth_internal).
 
--export([start/0, authorize/2, register_account/2]).
+-behaviour(gen_server).
+-export([start_link/0, authorize/2, register_account/2]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2,
+	 terminate/2, code_change/3]).
 
 -record(internal_account, {id,
 			   login,     % login
 			   password}).% password  md5 sum
+-record(state, {}).
 
 %%%----------------------------------------------------------------------
 %%% API
 %%%----------------------------------------------------------------------
-start() ->
+start_link() ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+init([]) ->
     mnesia:create_table(internal_account, [{disc_copies, [node()]},
 					   {attributes, record_info(fields, internal_account)},
-					   {index, [login]}]).
+					   {index, [login]}]),
+    {ok, #state{}}.
 
-%% Should be atomic
+authorize(Login, Password) ->
+    gen_server:call(?MODULE, {authorize, Login, Password}).
+
+register_account(Login, Password) ->
+    gen_server:call(?MODULE, {register_account, Login, Password}).
+
+%%%----------------------------------------------------------------------
+
 %% Result: {ok, Id}
 %%         {error, absent}
-authorize(Login, Password) ->
+handle_call({authorize, Login, Password}, _From, State) ->
     F = fun() ->
 		case mnesia:index_read(internal_account,
 				       Login,
@@ -36,12 +51,11 @@ authorize(Login, Password) ->
 		end
 	end,
     {atomic, Result} = mnesia:transaction(F),
-    Result.
+    {reply, Result, State};
 
-%% Should be atomic
 %% Result: {ok, Id}
 %%         {error, exists}
-register_account(Login, Password) ->
+handle_call({register_account, Login, Password}, _From, State) ->
     F = fun() ->
 		%% Maybe we should use dirty_index_read???
 		case mnesia:index_read(internal_account,
@@ -53,7 +67,7 @@ register_account(Login, Password) ->
 		end
 	end,
     {atomic, Result} = mnesia:transaction(F),
-    Result.
+    {reply, Result, State}.
 
 create_account(Login, Password) ->
     Seq = sequence_server:get_sequence(internal_account),
@@ -64,3 +78,15 @@ create_account(Login, Password) ->
 	end,
     {atomic, _Result} = mnesia:transaction(F),
     Seq.
+
+handle_cast(_Msg, State) ->
+    {noreply, State}.
+
+handle_info(_Info, State) ->
+    {noreply, State}.
+
+terminate(_Reason, _State) ->
+    ok.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
