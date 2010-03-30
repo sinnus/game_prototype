@@ -6,17 +6,19 @@
 %%% Created : 29 Mar 2010 by sinnus <sinnus@desktop>
 %%%-------------------------------------------------------------------
 -module(http_session_manager).
-
+-include("common.hrl").
 -behaviour(gen_server).
 
 %% API
 -export([start_link/0]).
 
 %% gen_server callbacks
--export([init/1, handle_call/3, handle_cast/2, handle_info/2,
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, stop/1,
+	 ensure_session/1,
 	 terminate/2, code_change/3]).
 
--record(state, {}).
+-record(sessions, {sid2pid,
+		   pid2sid}).
 
 %%====================================================================
 %% API
@@ -28,19 +30,35 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
+stop(Pid) ->
+    gen_server:cast(Pid, stop).
+
+ensure_session(Context) ->
+    case gen_server:call(?MODULE, {ensure_session, true, Context}) of
+        {ok, Context1} -> Context1;
+        {error, _} -> Context
+    end.
+
 %%====================================================================
 %% gen_server callbacks
 %%====================================================================
 
-%%--------------------------------------------------------------------
-%% Function: init(Args) -> {ok, State} |
-%%                         {ok, State, Timeout} |
-%%                         ignore               |
-%%                         {stop, Reason}
-%% Description: Initiates the server
-%%--------------------------------------------------------------------
 init([]) ->
-    {ok, #state{}}.
+    State = #sessions{sid2pid=dict:new(), pid2sid=dict:new()},
+    %% TODO: ???
+    %%process_flag(trap_exit, true),
+    {ok, State}.
+
+%% Ensure session
+handle_call({ensure_session, AllowNew, Context}, _From, State) ->
+    SessionId = Context#http_context.ssid,
+    case session_find_pid(SessionId, State) of
+	Pid when is_pid(Pid) orelse AllowNew ->
+	    {Context1, State1} = ensure_session1(State, Pid, Context, State),
+	    {reply, {ok, Context1}, State1};
+	undefined ->
+	    {reply, {error, no_session_pid}, State}
+    end;
 
 %%--------------------------------------------------------------------
 %% Function: %% handle_call(Request, From, State) -> {reply, Reply, State} |
@@ -93,3 +111,42 @@ code_change(_OldVsn, State, _Extra) ->
 %%--------------------------------------------------------------------
 %%% Internal functions
 %%--------------------------------------------------------------------
+
+%% Make sure that the session cookie is set and that the session process has been started.
+ensure_session1(S, P, Context, State) when S == undefined orelse P == error ->
+    Pid       = spawn_session(State),
+    SessionId = uuids:new(),
+    State1    = store_session_pid(SessionId, Pid, State),
+    Context1  = Context#http_context{ssid=SessionId},
+    {Context1, State1};
+ensure_session1(_SessionId, _Pid, Context, _State) ->
+    %%z_session:keepalive(Context#context.page_pid, Pid),
+    %%Context1  = Context#context{session_pid = Pid},
+    {Context, _State}.
+
+%% @spec session_find_pid(string(), State) ->  error | pid()
+%% @doc find the pid associated with the session id
+session_find_pid(undefined, _State) ->
+    error;
+session_find_pid(SessionId, State) ->
+    case dict:find(SessionId, State#sessions.sid2pid) of
+        {ok, Pid} ->
+            Pid;
+        error ->
+            error
+    end.
+
+%% @spec store_session_pid(pid(), State) -> State
+%% @doc Add the pid to the session state
+store_session_pid(SessionId, Pid, State) ->
+    State#sessions{
+      pid2sid = dict:store(Pid, SessionId, State#sessions.pid2sid),
+      sid2pid = dict:store(SessionId, Pid, State#sessions.sid2pid)
+     }.
+
+spawn_session(_State) ->
+    case http_session:start_link() of
+        {ok, Pid} ->
+	    erlang:monitor(process, Pid),
+	    Pid
+    end.
