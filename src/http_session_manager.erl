@@ -13,7 +13,7 @@
 -export([start_link/0]).
 
 %% gen_server callbacks
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, stop/1,
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, stop/0,
 	 ensure_session/1,
 	 terminate/2, code_change/3]).
 
@@ -30,8 +30,8 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
-stop(Pid) ->
-    gen_server:cast(Pid, stop).
+stop() ->
+    gen_server:cast(?MODULE, stop).
 
 ensure_session(Context) ->
     case gen_server:call(?MODULE, {ensure_session, true, Context}) of
@@ -46,7 +46,7 @@ ensure_session(Context) ->
 init([]) ->
     State = #sessions{sid2pid=dict:new(), pid2sid=dict:new()},
     %% TODO: ???
-    %%process_flag(trap_exit, true),
+    process_flag(trap_exit, true),
     {ok, State}.
 
 %% Ensure session
@@ -81,6 +81,12 @@ handle_call(_Request, _From, State) ->
 %%--------------------------------------------------------------------
 handle_cast(_Msg, State) ->
     {noreply, State}.
+
+
+%% Handle the down message from a stopped session, remove it from the session admin
+handle_info({'DOWN', _MonitorRef, process, Pid, _Info}, State) ->
+    State1 = erase_session_pid(Pid, State),
+    {noreply, State1};
 
 %%--------------------------------------------------------------------
 %% Function: handle_info(Info, State) -> {noreply, State} |
@@ -117,12 +123,12 @@ ensure_session1(S, P, Context, State) when S == undefined orelse P == error ->
     Pid       = spawn_session(State),
     SessionId = uuids:new(),
     State1    = store_session_pid(SessionId, Pid, State),
-    Context1  = Context#http_context{ssid=SessionId},
+    Context1  = Context#http_context{ssid=SessionId, session_pid = Pid},
     {Context1, State1};
-ensure_session1(_SessionId, _Pid, Context, _State) ->
+ensure_session1(_SessionId, Pid, Context, _State) ->
     %%z_session:keepalive(Context#context.page_pid, Pid),
-    %%Context1  = Context#context{session_pid = Pid},
-    {Context, _State}.
+    Context1  = Context#http_context{session_pid = Pid},
+    {Context1, _State}.
 
 %% @spec session_find_pid(string(), State) ->  error | pid()
 %% @doc find the pid associated with the session id
@@ -149,4 +155,17 @@ spawn_session(_State) ->
         {ok, Pid} ->
 	    erlang:monitor(process, Pid),
 	    Pid
+    end.
+
+%% @spec erase_session_pid(pid(), State) -> State
+%% @doc Remove the pid from the session state
+erase_session_pid(Pid, State) ->
+    case dict:find(Pid, State#sessions.pid2sid) of
+        {ok, Key} ->
+            State#sessions{
+	      pid2sid = dict:erase(Pid, State#sessions.pid2sid),
+	      sid2pid = dict:erase(Key, State#sessions.sid2pid)
+	     };
+        error ->
+            State
     end.

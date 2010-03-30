@@ -1,4 +1,4 @@
--record(http_context, {ssid}).
+-record(http_context, {ssid, session_pid}).
 
 %% Logger macros
 -define(PRINT(Format, Args),

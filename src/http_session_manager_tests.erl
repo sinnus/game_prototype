@@ -6,14 +6,25 @@
 server_test() ->
     crypto:start(),
     uuids:start(),
-    {ok, Pid} = http_session_manager:start_link(),
+    {ok, _Pid} = http_session_manager:start_link(),
 
     Context = #http_context{},
     Context1 = http_session_manager:ensure_session(Context),
     ?assertNot(Context1#http_context.ssid =:= undefined),
+    ?assertNot(Context1#http_context.session_pid =:= undefined),
+    ?assert(is_pid(Context1#http_context.session_pid)),
+
     Context2 = http_session_manager:ensure_session(Context1),
     ?assert(Context1#http_context.ssid =:= Context2#http_context.ssid),
+    ?assert(Context1#http_context.session_pid =:= Context2#http_context.session_pid),
+    http_session:stop(Context2#http_context.session_pid),
+
+    %% Waiting when http_session will be stoped
+    timer:sleep(10),
+
+    Context3 = http_session_manager:ensure_session(Context2),
+    ?assertNot(Context3#http_context.session_pid =:= Context2#http_context.session_pid),
     
-    http_session_manager:stop(Pid),
+    http_session_manager:stop(),
     uuids:stop(),
     crypto:stop().

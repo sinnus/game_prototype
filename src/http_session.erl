@@ -13,7 +13,7 @@
 -export([start_link/0]).
 
 %% gen_server callbacks
--export([init/1, handle_call/3, handle_cast/2, handle_info/2,
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, stop/1,
 	 terminate/2, code_change/3]).
 
 -record(state, {}).
@@ -28,6 +28,12 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
+stop(Pid) ->
+    try
+        gen_server:cast(Pid, stop)
+    catch _Class:_Term -> 
+        error 
+    end.
 %%====================================================================
 %% gen_server callbacks
 %%====================================================================
@@ -54,6 +60,9 @@ init([]) ->
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
+
+handle_cast(stop, State) ->
+    {stop, normal, State};
 
 %%--------------------------------------------------------------------
 %% Function: handle_cast(Msg, State) -> {noreply, State} |
