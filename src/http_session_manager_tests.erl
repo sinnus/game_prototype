@@ -55,14 +55,14 @@ server_test() ->
     erlang:monitor(process, SessionPid2),
     timer:sleep(1*2000),
 
-    Result = receive 
+    Result2 = receive 
 		 {'DOWN', _, process, SessionPid2, _} ->
 		     ok
 	     after 10000 ->
 		     timeout
 	     end,
 
-    ?assert(Result =:= ok),
+    ?assert(Result2 =:= ok),
     ?assertNot(erlang:is_process_alive(Context5#http_context.session_pid)),
     
     http_session_manager:stop(),
