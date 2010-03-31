@@ -53,12 +53,11 @@ server_test() ->
     Context5 = http_session_manager:ensure_session(Context4),
     SessionPid2 = Context5#http_context.session_pid,
     erlang:monitor(process, SessionPid2),
-    timer:sleep(1*2000),
 
     Result2 = receive 
 		 {'DOWN', _, process, SessionPid2, _} ->
 		     ok
-	     after 10000 ->
+	     after 2000 ->
 		     timeout
 	     end,
 
