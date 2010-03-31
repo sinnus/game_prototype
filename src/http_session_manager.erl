@@ -10,25 +10,30 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/2]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, stop/0,
-	 ensure_session/1,
+	 ensure_session/1, tick/1, now/0,
 	 terminate/2, code_change/3]).
 
 -record(sessions, {sid2pid,
-		   pid2sid}).
+		   pid2sid,
+		   session_timeout}).
 
 %%====================================================================
 %% API
 %%====================================================================
+
 %%--------------------------------------------------------------------
 %% Function: start_link() -> {ok,Pid} | ignore | {error,Error}
 %% Description: Starts the server
 %%--------------------------------------------------------------------
-start_link() ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+%% SessionCheckExpire - Number of seconds between session expiration checks
+%% SessionExpireTimeout - Expiration session time in seconds
+start_link(SessionCheckExpire, SessionExpireTimeout) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [SessionCheckExpire,
+						      SessionExpireTimeout], []).
 
 stop() ->
     gen_server:cast(?MODULE, stop).
@@ -39,13 +44,20 @@ ensure_session(Context) ->
         {error, _} -> Context
     end.
 
+%% @spec tick(pid()) -> void()
+%% @doc Periodic tick used for cleaning up sessions
+tick(Pid) when is_pid(Pid) ->
+    gen_server:cast(Pid, tick).
+
 %%====================================================================
 %% gen_server callbacks
 %%====================================================================
 
-init([]) ->
-    State = #sessions{sid2pid=dict:new(), pid2sid=dict:new()},
-    %% TODO: ???
+init([SessionCheckExpire, SessionExpireTimeout]) ->
+    State = #sessions{sid2pid=dict:new(),
+		      pid2sid=dict:new(),
+		      session_timeout=SessionExpireTimeout},
+    timer:apply_interval(SessionCheckExpire * 1000, ?MODULE, tick, [self()]),
     process_flag(trap_exit, true),
     {ok, State}.
 
@@ -73,6 +85,14 @@ handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
 
+handle_cast(tick, State) ->
+    Tick    = http_session_manager:now(),
+    SesPids = dict:fetch_keys(State#sessions.pid2sid),
+    lists:foreach(fun(Pid) -> http_session:check_expire(Tick, Pid) end, SesPids),
+    {noreply, State};
+
+handle_cast(stop, State) ->
+    {stop, normal, State};
 %%--------------------------------------------------------------------
 %% Function: handle_cast(Msg, State) -> {noreply, State} |
 %%                                      {noreply, State, Timeout} |
@@ -150,8 +170,8 @@ store_session_pid(SessionId, Pid, State) ->
       sid2pid = dict:store(SessionId, Pid, State#sessions.sid2pid)
      }.
 
-spawn_session(_State) ->
-    case http_session:start_link() of
+spawn_session(State) ->
+    case http_session:start_link(State#sessions.session_timeout) of
         {ok, Pid} ->
 	    erlang:monitor(process, Pid),
 	    Pid
@@ -169,3 +189,9 @@ erase_session_pid(Pid, State) ->
         error ->
             State
     end.
+
+%% TODO: Move to util module
+%% @doc Return the current tick count
+now() ->
+    {M,S,_M} = erlang:now(),
+    M*1000000 + S.

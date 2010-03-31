@@ -6,17 +6,21 @@
 %%% Created : 29 Mar 2010 by sinnus <sinnus@desktop>
 %%%-------------------------------------------------------------------
 -module(http_session).
-
+-include("common.hrl").
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, stop/1,
+	 keepalive/1, check_expire/2,
 	 terminate/2, code_change/3]).
 
--record(state, {}).
+-record(session, {
+	  expire,
+	  timeout
+	 }).
 
 %%====================================================================
 %% API
@@ -25,8 +29,8 @@
 %% Function: start_link() -> {ok,Pid} | ignore | {error,Error}
 %% Description: Starts the server
 %%--------------------------------------------------------------------
-start_link() ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+start_link(SessionExpireTimeout) ->
+    gen_server:start_link(?MODULE, [SessionExpireTimeout], []).
 
 stop(Pid) ->
     try
@@ -34,6 +38,16 @@ stop(Pid) ->
     catch _Class:_Term -> 
         error 
     end.
+
+%% @doc Reset the expire counter of the session, called from the page process when comet attaches
+keepalive(Pid) ->
+    gen_server:cast(Pid, keepalive).
+
+%% @spec check_expire(Now::integer(), Pid::pid()) -> none()
+%% @doc Check session and page expiration, periodically called by the session manager
+check_expire(Now, Pid) ->
+    gen_server:cast(Pid, {check_expire, Now}).
+
 %%====================================================================
 %% gen_server callbacks
 %%====================================================================
@@ -45,8 +59,12 @@ stop(Pid) ->
 %%                         {stop, Reason}
 %% Description: Initiates the server
 %%--------------------------------------------------------------------
-init([]) ->
-    {ok, #state{}}.
+init([SessionExpireTimeout]) ->
+    Session = #session{
+      expire = http_session_manager:now() + SessionExpireTimeout,
+      timeout = SessionExpireTimeout
+     },
+    {ok, Session}.
 
 %%--------------------------------------------------------------------
 %% Function: %% handle_call(Request, From, State) -> {reply, Reply, State} |
@@ -63,6 +81,21 @@ handle_call(_Request, _From, State) ->
 
 handle_cast(stop, State) ->
     {stop, normal, State};
+
+%% @doc Reset the timeout counter for the session and, optionally, a specific page
+handle_cast(keepalive, Session) ->
+    Now      = http_session_manage:now(),
+    Session1 = Session#session{expire=Now + Session#session.timeout},
+    {noreply, Session1};
+
+%% @doc Check session expiration, stop when passed expiration.
+handle_cast({check_expire, Now}, Session) ->
+    if 
+	Session#session.expire < Now -> 
+	    {stop, normal, Session};
+	true -> 
+	    {noreply, Session}
+    end;
 
 %%--------------------------------------------------------------------
 %% Function: handle_cast(Msg, State) -> {noreply, State} |
