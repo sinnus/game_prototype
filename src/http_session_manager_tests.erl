@@ -26,6 +26,8 @@ server_test() ->
 	{'DOWN', _Ref, process, Pid2, _Reason} ->
 	    ?assert(Pid2 =:= Context2#http_context.session_pid),
 	    ok
+    after 10000 ->
+	    timeout
     end,
 
     Context3 = http_session_manager:ensure_session(Context2),
