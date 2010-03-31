@@ -6,6 +6,7 @@
 server_test() ->
     crypto:start(),
     uuids:start(),
+
     {ok, _Pid} = http_session_manager:start_link(),
 
     Context = #http_context{},
@@ -17,10 +18,15 @@ server_test() ->
     Context2 = http_session_manager:ensure_session(Context1),
     ?assert(Context1#http_context.ssid =:= Context2#http_context.ssid),
     ?assert(Context1#http_context.session_pid =:= Context2#http_context.session_pid),
+    erlang:monitor(process, Context2#http_context.session_pid),
     http_session:stop(Context2#http_context.session_pid),
 
     %% Waiting when http_session will be stoped
-    timer:sleep(10),
+    receive 
+	{'DOWN', _Ref, process, Pid2, _Reason} ->
+	    ?assert(Pid2 =:= Context2#http_context.session_pid),
+	    ok
+    end,
 
     Context3 = http_session_manager:ensure_session(Context2),
     ?assertNot(Context3#http_context.session_pid =:= Context2#http_context.session_pid),
