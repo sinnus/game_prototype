@@ -12,27 +12,21 @@ ensure_all(ReqData, Context) ->
     {ReqData1, Context1} = ensure_session_id(ReqData, Context),
     ensure_auth(ReqData1, Context1).
 
-ensure_auth(ReqData, Context) ->
+ensure_auth(_ReqData, _Context) ->
     ok.
 
 ensure_session_id(ReqData, Context) ->
-    SessionIdValue = wrq:get_cookie_value(?SESSION_COOKIE, ReqData),
-    create_or_update_ssid(ReqData, Context, SessionIdValue).
+    SessionId = list_to_binary(wrq:get_cookie_value(?SESSION_COOKIE, ReqData)),
+    Context1 = Context#http_context{ssid = SessionId},
+    Context2 = http_session_manager:ensure_session(Context1),
+    NewSessionId = Context2#http_context.ssid,
 
-%% Internal functions
-create_or_update_ssid(ReqData, Context, undefined) ->
-    SessionId = http_session_server:new_session(http_session_server),
-    ReqData1 = replace_cookie_value(ReqData, ?SESSION_COOKIE, SessionId),
-    {ReqData1, Context#http_context{ssid = SessionId}};
-    
-create_or_update_ssid(ReqData, Context, SessionIdValue) ->
-    SessionId = list_to_binary(SessionIdValue),
-    case http_session_server:new_or_update_session(http_session_server, SessionId) of
-	{update, _} ->
-	    {ReqData, Context#http_context{ssid = SessionId}};
-	{new, NewSessionId} ->
-	    {replace_cookie_value(ReqData, ?SESSION_COOKIE, NewSessionId),
-	     Context#http_context{ssid = NewSessionId}}
+    case Context2#http_context.ssid =:= SessionId of
+	true ->
+	    {ReqData, Context2};
+	false ->
+	    ReqData1 = replace_cookie_value(ReqData, ?SESSION_COOKIE, NewSessionId),
+	    {ReqData1,  Context2}
     end.
 
 %% Move to macros
