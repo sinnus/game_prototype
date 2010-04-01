@@ -57,7 +57,7 @@ server_test() ->
     Result2 = receive 
 		 {'DOWN', _, process, SessionPid2, _} ->
 		     ok
-	     after 2000 ->
+	     after 3000 ->
 		     timeout
 	     end,
 
