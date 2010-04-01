@@ -146,7 +146,7 @@ ensure_session1(S, P, Context, State) when S == undefined orelse P == error ->
     Context1  = Context#http_context{ssid=SessionId, session_pid = Pid},
     {Context1, State1};
 ensure_session1(_SessionId, Pid, Context, _State) ->
-    %%z_session:keepalive(Context#context.page_pid, Pid),
+    http_session:keepalive(Pid),
     Context1  = Context#http_context{session_pid = Pid},
     {Context1, _State}.
 

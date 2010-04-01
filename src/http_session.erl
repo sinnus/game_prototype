@@ -84,7 +84,7 @@ handle_cast(stop, State) ->
 
 %% @doc Reset the timeout counter for the session and, optionally, a specific page
 handle_cast(keepalive, Session) ->
-    Now      = http_session_manage:now(),
+    Now      = http_session_manager:now(),
     Session1 = Session#session{expire=Now + Session#session.timeout},
     {noreply, Session1};
 
