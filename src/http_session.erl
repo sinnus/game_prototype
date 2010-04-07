@@ -14,12 +14,14 @@
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, stop/1,
-	 keepalive/1, check_expire/2,
+	 keepalive/1, check_expire/2, set_account_id/2, reset_account_id/1,
+	 get_account_id/1,
 	 terminate/2, code_change/3]).
 
 -record(session, {
 	  expire,
-	  timeout
+	  timeout,
+	  account_id
 	 }).
 
 %%====================================================================
@@ -34,9 +36,9 @@ start_link(SessionExpireTimeout) ->
 
 stop(Pid) ->
     try
-        gen_server:cast(Pid, stop)
+        gen_server:call(Pid, stop)
     catch _Class:_Term -> 
-        error 
+	    error 
     end.
 
 %% @doc Reset the expire counter of the session, called from the page process when comet attaches
@@ -48,6 +50,18 @@ keepalive(Pid) ->
 check_expire(Now, Pid) ->
     gen_server:cast(Pid, {check_expire, Now}).
 
+%% @doc Set account_id
+set_account_id(Pid, AccountId) ->
+    gen_server:call(Pid, {set_account_id, AccountId}).
+
+%% @doc Reset account_id
+reset_account_id(Pid) ->
+    gen_server:call(Pid, {reset_account_id}).
+
+%% @doc Get account_id
+%% result - integer or undefined
+get_account_id(Pid) ->
+    gen_server:call(Pid, {get_account_id}).    
 %%====================================================================
 %% gen_server callbacks
 %%====================================================================
@@ -75,12 +89,24 @@ init([SessionExpireTimeout]) ->
 %%                                      {stop, Reason, State}
 %% Description: Handling call messages
 %%--------------------------------------------------------------------
+handle_call(stop, _From, State) ->
+    {stop, normal, ok, State};
+
+handle_call({set_account_id, AccountId}, _From, State) ->
+    State1 = State#session{account_id = AccountId},
+    {reply, ok, State1};
+
+handle_call({reset_account_id}, _From, State) ->
+    State1 = State#session{account_id = undefined},
+    {reply, ok, State1};
+
+handle_call({get_account_id}, _From, State) ->
+    AccountId = State#session.account_id,
+    {reply, AccountId, State};
+
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
-
-handle_cast(stop, State) ->
-    {stop, normal, State};
 
 %% @doc Reset the timeout counter for the session and, optionally, a specific page
 handle_cast(keepalive, Session) ->
@@ -96,7 +122,6 @@ handle_cast({check_expire, Now}, Session) ->
 	true -> 
 	    {noreply, Session}
     end;
-
 %%--------------------------------------------------------------------
 %% Function: handle_cast(Msg, State) -> {noreply, State} |
 %%                                      {noreply, State, Timeout} |

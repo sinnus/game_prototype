@@ -63,6 +63,16 @@ server_test() ->
 
     ?assert(Result2 =:= ok),
     ?assertNot(erlang:is_process_alive(Context5#http_context.session_pid)),
+
+    %% Check account_id functions
+    Context6 = #http_context{},
+    Context7 = http_session_manager:ensure_session(Context6),
+    Pid10 = Context7#http_context.session_pid,
+
+    http_session:set_account_id(Pid10, 123),
+    ?assert(http_session:get_account_id(Pid10) =:= 123),
+    http_session:reset_account_id(Pid10),
+    ?assert(http_session:get_account_id(Pid10) =:= undefined),
     
     http_session_manager:stop(),
 
