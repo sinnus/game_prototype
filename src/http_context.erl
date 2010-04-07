@@ -4,19 +4,18 @@
 %%% Created : 22 Nov 2009 by sinnus <sinnus@linux>
 -module(http_context).
 
--export([ensure_session_id/2]).
+-export([ensure_session_id/2, ensure_all/2]).
 -include("common.hrl").
 -define(SESSION_COOKIE, "PHPSESSID").
 
 ensure_all(ReqData, Context) ->
     {ReqData1, Context1} = ensure_session_id(ReqData, Context),
-    ensure_auth(ReqData1, Context1).
-
-ensure_auth(_ReqData, _Context) ->
-    ok.
+    http_session:get_account_id(Context1#http_context.session_pid),
+    {ReqData1, Context1}.
 
 ensure_session_id(ReqData, Context) ->
-    SessionId = list_to_binary(wrq:get_cookie_value(?SESSION_COOKIE, ReqData)),
+    SessionId = get_session_id(ReqData),
+
     Context1 = Context#http_context{ssid = SessionId},
     Context2 = http_session_manager:ensure_session(Context1),
     NewSessionId = Context2#http_context.ssid,
@@ -28,6 +27,12 @@ ensure_session_id(ReqData, Context) ->
 	    ReqData1 = replace_cookie_value(ReqData, ?SESSION_COOKIE, NewSessionId),
 	    {ReqData1,  Context2}
     end.
+
+get_session_id(ReqData) when is_list(ReqData) ->
+    list_to_binary(wrq:get_cookie_value(?SESSION_COOKIE, ReqData));
+
+get_session_id(_ReqData) ->
+    undefined.
 
 %% Move to macros
 replace_cookie_value(ReqData, CookieName, CookieValue) ->

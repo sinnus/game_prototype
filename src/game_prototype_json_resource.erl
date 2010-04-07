@@ -35,7 +35,7 @@ process_post(RD, Ctx) ->
     end.
 
 do_process_post(RD, Ctx) ->
-    {RD1, Ctx1} = http_context:ensure_session_id(RD, Ctx),
+    {RD1, Ctx1} = http_context:ensure_all(RD, Ctx),
     JsonData = try
 		   mochijson2:decode(wrq:req_body(RD))
 	       catch
