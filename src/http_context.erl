@@ -14,7 +14,7 @@ ensure_all(ReqData, Context) ->
     {ReqData1, Context1}.
 
 ensure_session_id(ReqData, Context) ->
-    SessionId = get_session_id(ReqData),
+    SessionId = get_session_id(wrq:get_cookie_value(?SESSION_COOKIE, ReqData)),
 
     Context1 = Context#http_context{ssid = SessionId},
     Context2 = http_session_manager:ensure_session(Context1),
@@ -28,10 +28,10 @@ ensure_session_id(ReqData, Context) ->
 	    {ReqData1,  Context2}
     end.
 
-get_session_id(ReqData) when is_list(ReqData) ->
-    list_to_binary(wrq:get_cookie_value(?SESSION_COOKIE, ReqData));
+get_session_id(CookieValue) when is_list(CookieValue) ->
+    list_to_binary(CookieValue);
 
-get_session_id(_ReqData) ->
+get_session_id(_CookieValue) ->
     undefined.
 
 %% Move to macros
