@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:net="flash.net.*">
-    <mx:Button id="btn1" label="POST" click="onClick()"/>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" xmlns:net="flash.net.*">
+    <mx:Button id="btn1" label="Register" click="onRegisterClick()"/>
+    <mx:Button id="btn2" label="Login" click="onLoginClick()"/>
+    <mx:Button id="btn3" label="IsLogin" click="onIsLoginClick()"/>
     <mx:Script>
         <![CDATA[
             import org.my.jsonrpc.FaultEvent;
@@ -11,7 +13,16 @@
 
             private var jsonService:JSONHTTPService = new JSONHTTPService("http://localhost:8000/json");
 
-            private function onClick():void
+			private function onLoginClick():void
+			{
+                jsonService.callService("loginAccount", ["Account1", "Password"], resultHanlder, faultHandler);				
+			}
+
+			private function onIsLoginClick():void
+			{
+                jsonService.callService("getCurrentAccount", [], resultHanlder, faultHandler);				
+			}
+            private function onRegisterClick():void
             {
                 jsonService.callService("registerAccount", ["Account1", "Password"], resultHanlder, faultHandler);
             }
@@ -23,7 +34,7 @@
 
             private function resultHanlder(event:ResultEvent):void
             {
-                Alert.show(event.result.username, "Result");
+                Alert.show(event.result as String, "Result");
             }
         ]]>
     </mx:Script>

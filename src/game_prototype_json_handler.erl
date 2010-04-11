@@ -11,7 +11,6 @@ do_call({<<"removeFiles">>, _Params, _Ctx}) ->
 
 %% Params -> [Login]
 do_call({<<"registerAccount">>, [Login, Password], _Ctx}) ->
-    ?DEBUG("Login: ~p, password: ~p", [Login, Password]),
     case auth_internal:register_account(Login, Password) of
 	{ok, _} ->
 	    {result, <<"ok">>};
@@ -19,13 +18,22 @@ do_call({<<"registerAccount">>, [Login, Password], _Ctx}) ->
 	    {error, Reason}
     end;
 
-do_call({<<"getSsid">>, _Params, Ctx}) ->
-    {result, Ctx#http_context.ssid};
+do_call({<<"loginAccount">>, [Login, Password], Ctx}) ->
+    case http_context:login(Ctx, Login, Password) of
+	{ok, Ctx1} ->
+	    {result, <<"login ok">>};
+	{error, Ctx1} ->
+	    {error, <<"login failed">>}
+    end;
 
-do_call({<<"fail">>, _Params, _Ctx}) ->
-    _A = 0 / 0,
-    {result, {struct, [{<<"username">>, <<"фио">>}]}};
-
+do_call({<<"getCurrentAccount">>, [], Ctx}) ->
+    case Ctx#http_context.account_id of
+	undefined ->
+	    {result, <<"account id doesn't exists">>};
+	AccountId ->
+	    {result, list_to_binary(integer_to_list(AccountId))}
+    end;
+    
 do_call({Method, _Params, _Ctx}) ->
     ErrorMessage = io_lib:format("Method ~p doesn't exist", [binary_to_list(Method)]),
     {error, erlang:iolist_to_binary(ErrorMessage)}.
