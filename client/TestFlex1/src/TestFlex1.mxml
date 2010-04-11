@@ -13,7 +13,7 @@
 
             private function onClick():void
             {
-                jsonService.callService("removeFiles", [], resultHanlder, faultHandler);
+                jsonService.callService("registerAccount", ["Account1", "Password"], resultHanlder, faultHandler);
             }
 
             private function faultHandler(event:FaultEvent):void

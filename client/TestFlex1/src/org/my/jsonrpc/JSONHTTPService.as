@@ -18,13 +18,13 @@ package org.my.jsonrpc
             _url = url;
         }
 
-        public function callService(method:String, args:Array,
+        public function callService(method:String, args:Object,
                                     resultHandler:Function = null,  faultHandler:Function = null):void
         {
             var req:URLRequest = new URLRequest(_url);
             req.method = URLRequestMethod.POST;
             var message:String = JSON.encode(args);
-            req.data = '{"method": "' + method + '", "id": null, "params": [' + message + ']}';
+            req.data = '{"method": "' + method + '", "id": null, "params": ' + message + '}';
             var jsonResponder:JSONHTTPResponder = new JSONHTTPResponder();
             jsonResponder.resultCallback = resultHandler;
             jsonResponder.faultCallback = faultHandler;

@@ -10,9 +10,14 @@ do_call({<<"removeFiles">>, _Params, _Ctx}) ->
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
 %% Params -> [Login]
-do_call({<<"registerAccount">>, [Login], _Ctx}) when is_binary(Login)->
-    ?DEBUG("Login: ~p", [Login]),
-    {result, <<"ok">>};
+do_call({<<"registerAccount">>, [Login, Password], _Ctx}) ->
+    ?DEBUG("Login: ~p, password: ~p", [Login, Password]),
+    case auth_internal:register_account(Login, Password) of
+	{ok, _} ->
+	    {result, <<"ok">>};
+	{error, Reason} ->
+	    {error, Reason}
+    end;
 
 do_call({<<"getSsid">>, _Params, Ctx}) ->
     {result, Ctx#http_context.ssid};
@@ -23,5 +28,4 @@ do_call({<<"fail">>, _Params, _Ctx}) ->
 
 do_call({Method, _Params, _Ctx}) ->
     ErrorMessage = io_lib:format("Method ~p doesn't exist", [binary_to_list(Method)]),
-    ?DEBUG(ErrorMessage, []),
     {error, erlang:iolist_to_binary(ErrorMessage)}.
