@@ -6,20 +6,25 @@
 
 -export([ensure_session_id/2,
 	 ensure_all/2,
-	 login/3]).
+	 login/4]).
 -include("common.hrl").
 -define(SESSION_COOKIE, "PHPSESSID").
 
-% {ok, account_id}
-% {error, Reason}
-login(Context, Login, Password) ->
+% {ok, ReqData, Context}
+% {error, ReqData, Context}
+login(ReqData, Context, Login, Password) ->
     case auth_internal:authorize(Login, Password) of
 	{ok, AccountId} ->
-	    http_session:set_account_id(Context#http_context.session_pid, AccountId),
-	    Context1 = Context#http_context{account_id = AccountId},
-	    {ok, Context1};
-	{error, Reason} ->
-	    {error, Context}
+	    Context1 = Context#http_context{ssid = undefined, session_pid = undefined},
+	    Context2 = http_session_manager:ensure_session(Context1),
+	    NewSessionId = Context2#http_context.ssid,
+	    ReqData1 = replace_cookie_value(ReqData, ?SESSION_COOKIE, NewSessionId),
+
+	    http_session:set_account_id(Context2#http_context.session_pid, AccountId),
+	    Context3 = Context2#http_context{account_id = AccountId},
+	    {ok, ReqData1, Context3};
+	{error, _Reason} ->
+	    {error, ReqData, Context}
     end.
 
 ensure_all(ReqData, Context) ->

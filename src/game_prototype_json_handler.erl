@@ -18,13 +18,13 @@ do_call({<<"registerAccount">>, [Login, Password], _Ctx}) ->
 	    {error, Reason}
     end;
 
-do_call({<<"loginAccount">>, [Login, Password], Ctx}) ->
-    case http_context:login(Ctx, Login, Password) of
-	{ok, Ctx1} ->
-	    {result, <<"login ok">>};
-	{error, Ctx1} ->
-	    {error, <<"login failed">>}
-    end;
+%% do_call({<<"loginAccount">>, [Login, Password], Ctx}) ->
+%%     case http_context:login(Ctx, Login, Password) of
+%% 	{ok, Ctx1} ->
+%% 	    {result, <<"login ok">>};
+%% 	{error, Ctx1} ->
+%% 	    {error, <<"login failed">>}
+%%     end;
 
 do_call({<<"getCurrentAccount">>, [], Ctx}) ->
     case Ctx#http_context.account_id of
