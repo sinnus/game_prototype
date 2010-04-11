@@ -5,6 +5,7 @@
     <mx:Button id="btn3" label="IsLogin" click="onIsLoginClick()"/>
     <mx:Script>
         <![CDATA[
+        	import mx.messaging.AbstractConsumer;
             import org.my.jsonrpc.FaultEvent;
             import org.my.jsonrpc.ResultEvent;
             import org.my.jsonrpc.JSONHTTPService;
@@ -15,7 +16,23 @@
 
 			private function onLoginClick():void
 			{
-                jsonService.callService("loginAccount", ["Account1", "Password"], resultHanlder, faultHandler);				
+				var req:URLRequest = new URLRequest("http://localhost:8000/login.php");
+				req.method = URLRequestMethod.POST;
+				var vars:URLVariables = new URLVariables();
+				vars.login = "Account1";
+				vars.password = "Password";
+				req.data = vars;
+				var loader:URLLoader = new URLLoader();
+				loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):void {
+					Alert.show(event.text, "Error");
+				});
+				loader.addEventListener(Event.COMPLETE, function(event:Event): void {
+					Alert.show(loader.data as String, "Result");
+				});
+				loader.addEventListener(IOErrorEvent.IO_ERROR, function(event:IOErrorEvent): void {
+					Alert.show(event.text, "Error");
+				});	
+				loader.load(req);		
 			}
 
 			private function onIsLoginClick():void
@@ -37,5 +54,5 @@
                 Alert.show(event.result as String, "Result");
             }
         ]]>
-    </mx:Script>
+    </mx:Script>  
 </mx:Application>
