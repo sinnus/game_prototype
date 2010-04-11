@@ -9,6 +9,11 @@
 do_call({<<"removeFiles">>, _Params, _Ctx}) ->
     {result, {struct, [{<<"username">>, <<"фио">>}]}};
 
+%% Params -> [Login]
+do_call({<<"registerAccount">>, [Login], _Ctx}) when is_binary(Login)->
+    ?DEBUG("Login: ~p", [Login]),
+    {result, <<"ok">>};
+
 do_call({<<"getSsid">>, _Params, Ctx}) ->
     {result, Ctx#http_context.ssid};
 
