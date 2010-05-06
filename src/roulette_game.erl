@@ -1,16 +1,9 @@
 %%%-------------------------------------------------------------------
 %%% File    : roulette_game.erl
-<<<<<<< HEAD
 %%% Author  : sinnus <sinnus@desktop>
 %%% Description : 
 %%%
 %%% Created :  6 May 2010 by sinnus <sinnus@desktop>
-=======
-%%% Author  : sinnus <sinnus@linux>
-%%% Description : 
-%%%
-%%% Created : 12 Apr 2010 by sinnus <sinnus@linux>
->>>>>>> 91d7a3304d7d3df22365ca87df5cdfdc0e19cbdd
 %%%-------------------------------------------------------------------
 -module(roulette_game).
 
@@ -33,15 +26,10 @@
 %% Description: Starts the server
 %%--------------------------------------------------------------------
 start_link() ->
-<<<<<<< HEAD
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
-
-=======
-    gen_server:start_link(?MODULE, [], []).
 
 join_player() ->
     ok.
->>>>>>> 91d7a3304d7d3df22365ca87df5cdfdc0e19cbdd
 %%====================================================================
 %% gen_server callbacks
 %%====================================================================

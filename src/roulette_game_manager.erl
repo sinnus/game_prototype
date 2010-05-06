@@ -1,6 +1,5 @@
 %%%-------------------------------------------------------------------
 %%% File    : roulette_game_manager.erl
-<<<<<<< HEAD
 %%% Author  : sinnus <sinnus@desktop>
 %%% Description : 
 %%%
@@ -10,15 +9,6 @@
 
 -include("roulette_game.hrl").
 
-=======
-%%% Author  : sinnus <sinnus@linux>
-%%% Description : 
-%%%
-%%% Created : 12 Apr 2010 by sinnus <sinnus@linux>
-%%%-------------------------------------------------------------------
--module(roulette_game_manager).
-
->>>>>>> 91d7a3304d7d3df22365ca87df5cdfdc0e19cbdd
 -behaviour(gen_server).
 
 %% API
@@ -38,7 +28,6 @@
 %% Description: Starts the server
 %%--------------------------------------------------------------------
 start_link() ->
-<<<<<<< HEAD
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 create(RoulettePlayer) ->
@@ -52,10 +41,6 @@ leave(RouletteGamePid, RoulettePlayer) ->
 
 findGames(PlayerId) ->
     ok.
-=======
-    gen_server:start_link(?MODULE, [], []).
->>>>>>> 91d7a3304d7d3df22365ca87df5cdfdc0e19cbdd
-
 %%====================================================================
 %% gen_server callbacks
 %%====================================================================
